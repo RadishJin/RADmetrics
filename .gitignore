@@ -5,7 +5,7 @@ test_dataset/*
 !test_dataset/.gitkeep
 result/*
 !result/.gitkeep
-.vscode/
+.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
