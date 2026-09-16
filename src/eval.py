@@ -76,15 +76,54 @@ for file in sorted(directory.iterdir()):
 
 
 
+########
+# 데이터 구조가..
+# ans_dict_bb[id] = 정답데이터_backbone
+# ans_dict_ca[id] = 정답데이터_alphacarbon
+# decoy_dict[id_bb] = { (파일이름 : decoy데이터)  이렇게 id의 backbone decoy 파일들 저장 }
+# decoy_dict[id_ca] = { (파일이름 : decoy데이터)  이렇게 id의 backbone decoy 파일들 저장 }
+########
+
+
+
 # Metric 계산하기
 
+# metric 결과값 저장소
+decoy_rmsd_dict = {}
+decoy_lddt_dict = {}
+decoy_tmscore_dict = {}
+for id in id_list:
+    decoy_rmsd_dict.setdefault(f"{id}_bb", [])
+    decoy_rmsd_dict.setdefault(f"{id}_ca", [])
+# print(decoy_rmsd_dict.keys())
+for id in id_list:
+    decoy_lddt_dict.setdefault(f"{id}_bb", [])
+    decoy_lddt_dict.setdefault(f"{id}_ca", [])
+# print(decoy_lddt_dict.keys())
+for id in id_list:
+    decoy_tmscore_dict.setdefault(f"{id}", [])
+# print(decoy_tmscore_dict.keys())
+
+
+# test
+# ['decoy_1CRN_0.5angstrom', 'decoy_1CRN_1.0angstrom', 'decoy_1CRN_10degree', 'decoy_1CRN_2.0angstrom', 'decoy_1CRN_5.0angstrom', 'decoy_1CRN_5degree', 'decoy_1CRN_ex30', 'decoy_1CRN_ex60']
+# 0.7153824065272497
+# 1.4128974324698986
+# 58.361695975918884
+# 2.8623942985583017
+# 7.160457759030418
+# 28.658485820659063
+# 7.191420607572877
+# 13.848104800380229
 
 # rmsd - backbone
-
-rmspd = struc.rmspd(ans_dict_bb["1CRN"], decoy_dict["1CRN_bb"]["decoy_1CRN_ex30"])
-lddt = struc.lddt(ans_dict_bb["1CRN"], decoy_dict["1CRN_bb"]["decoy_1CRN_ex30"])
-print(rmspd, lddt)
-
+decoy_list = list(decoy_dict)
+for id in id_list:
+    decoy_list = list(decoy_dict[f"{id}_bb"].keys())
+    # print(decoy_list)
+    for decoy in decoy_list:
+        rmspd = struc.rmspd(ans_dict_bb[f"{id}"], decoy_dict[f"{id}_bb"][f"{decoy}"])
+        print(rmspd)
 
 # rmsd - Ca
 
@@ -95,5 +134,6 @@ print(rmspd, lddt)
 # TMscore
 
 
-# + RADetector
+# .csv 파일로 뽑기
+# 이미지로 뽑기
 
