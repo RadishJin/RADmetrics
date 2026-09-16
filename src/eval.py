@@ -1,5 +1,6 @@
 import biotite.structure.io.pdbx as pdbx    # 읽어오기    
 from pathlib import Path
+import biotite.structure as struc
 
 # 정답 데이터 가져오기
 
@@ -36,6 +37,7 @@ for id, ans in ans_dict.items():
 # print(ans_dict_ca["5DK3"])
 
 
+
 # decoy 가져오기
 
 # decoy - backbone, Ca
@@ -70,9 +72,7 @@ for file in sorted(directory.iterdir()):
                 pre0 = pre0[is_ca]
                 decoy_dict[f"{id}_ca"][file.stem] = pre0
                 decoy_dict[file.name] = pre0
-print(decoy_dict["1CLL_ca"].keys())
-    
-
+# print(decoy_dict["1CLL_bb"].keys())
 
 
 
@@ -80,6 +80,11 @@ print(decoy_dict["1CLL_ca"].keys())
 
 
 # rmsd - backbone
+
+rmspd = struc.rmspd(ans_dict_bb["1CRN"], decoy_dict["1CRN_bb"]["decoy_1CRN_ex30"])
+lddt = struc.lddt(ans_dict_bb["1CRN"], decoy_dict["1CRN_bb"]["decoy_1CRN_ex30"])
+print(rmspd, lddt)
+
 
 # rmsd - Ca
 
@@ -91,3 +96,4 @@ print(decoy_dict["1CLL_ca"].keys())
 
 
 # + RADetector
+
