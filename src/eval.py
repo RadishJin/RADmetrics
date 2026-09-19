@@ -2,6 +2,7 @@ import biotite.structure.io.pdbx as pdbx    # 읽어오기
 from pathlib import Path
 import biotite.structure as struc
 import numpy as np
+import pandas as pd
 
 
 # 정답 데이터 가져오기
@@ -174,5 +175,20 @@ for id in id_list:
 # print(tm_list)
 
 # .csv 파일로 뽑기
+
+
+#                      |rmsd-bb | rmsd-ca | tmscore | lddt-bb | lddt-ca
+#  noise   0.5A
+#          1.0A
+#          2.0A
+#          5.0A  
+#  torsion 5degree
+#  angle   10degree
+#  local   30degree
+# pertur.  60degree
+
+
+# print(dataset)
+
 # 이미지로 뽑기
 
