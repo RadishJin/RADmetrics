@@ -1,3 +1,12 @@
+# Dataset files
+raw_dataset/*
+!raw_dataset/.gitkeep
+test_dataset/*
+!test_dataset/.gitkeep
+result/*
+!result/.gitkeep
+.vscode
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
