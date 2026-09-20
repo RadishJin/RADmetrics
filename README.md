@@ -38,8 +38,7 @@ RADetector/
 ├── LICENSE
 ├── README.md
 └── run.sh
-
----
+```
 
 ## Overview
 
