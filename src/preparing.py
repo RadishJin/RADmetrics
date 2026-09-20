@@ -1,12 +1,9 @@
-from parsing import parsing                 # 파싱 데이터 생성
 import biotite.structure.io.pdbx as pdbx    # 읽어오기     
 import biotite.structure as struc
 import torch                                # 텐서 변환, 노이즈 생성용 
 from math import pi
 import random
 
-
-# parsing()   # 파싱 데이터 생성. 이미 있으면 덮어써버림
 
 id_list = ["1CRN", "1CLL", "5DK3"]
 data_dict = {}
