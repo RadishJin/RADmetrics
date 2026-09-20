@@ -126,7 +126,7 @@ for id in id_list:
     decoy_list = list(decoy_dict[f"{id}_bb"].keys())
     # print(decoy_list)
     for decoy in decoy_list:
-        rmspd = struc.rmspd(ans_dict_bb[f"{id}"], decoy_dict[f"{id}_bb"][f"{decoy}"])
+        rmspd = round(struc.rmspd(ans_dict_bb[f"{id}"], decoy_dict[f"{id}_bb"][f"{decoy}"]), 3)
         rmsd_bb_list.append(rmspd)
 
 # rmsd - Ca
@@ -136,7 +136,7 @@ for id in id_list:
     decoy_list = list(decoy_dict[f"{id}_ca"].keys())
     # print(decoy_list)
     for decoy in decoy_list:
-        rmspd = struc.rmspd(ans_dict_ca[f"{id}"], decoy_dict[f"{id}_ca"][f"{decoy}"])
+        rmspd = round(struc.rmspd(ans_dict_ca[f"{id}"], decoy_dict[f"{id}_ca"][f"{decoy}"]), 3)
         rmsd_ca_list.append(rmspd)
 
 # lDDT - backbone
@@ -146,7 +146,7 @@ for id in id_list:
     decoy_list = list(decoy_dict[f"{id}_bb"].keys())
     # print(decoy_list)
     for decoy in decoy_list:
-        lddt = struc.lddt(ans_dict_bb[f"{id}"], decoy_dict[f"{id}_bb"][f"{decoy}"])
+        lddt = round(struc.lddt(ans_dict_bb[f"{id}"], decoy_dict[f"{id}_bb"][f"{decoy}"]), 3)
         lddt_bb_list.append(lddt)
 
 # lDDT - Ca
@@ -156,7 +156,7 @@ for id in id_list:
     decoy_list = list(decoy_dict[f"{id}_ca"].keys())
     # print(decoy_list)
     for decoy in decoy_list:
-        lddt = struc.lddt(ans_dict_ca[f"{id}"], decoy_dict[f"{id}_ca"][f"{decoy}"])
+        lddt = round(struc.lddt(ans_dict_ca[f"{id}"], decoy_dict[f"{id}_ca"][f"{decoy}"]), 3)
         lddt_ca_list.append(lddt)
 
 # TMscore
@@ -170,7 +170,7 @@ for id in id_list:
         # print(type(sup_pos))
         n_range = np.arange(len(ans_dict_ca[f"{id}"]))
         # print(n_range)
-        tm = struc.tm_score(ans_dict_ca[f"{id}"], sup_pos[0], n_range, n_range)
+        tm = round(struc.tm_score(ans_dict_ca[f"{id}"], sup_pos[0], n_range, n_range), 3)
         tm_list.append(tm)
 # print(tm_list)
 
@@ -188,7 +188,37 @@ for id in id_list:
 # pertur.  60degree
 
 
-# print(dataset)
+pre_dataset = np.column_stack((rmsd_bb_list, rmsd_ca_list, tm_list, lddt_bb_list, lddt_ca_list))
+# print(pre_dataset)
+i = 0
+data_dict = {}
+for id in id_list:
+    dataset = pre_dataset[[i, i + 1, i + 3, i + 4, i + 5, i + 2, i + 6, i + 7]]
+    data_dict[f"{id}"] = dataset
+    i += 8
+    # print(dataset)
+# print(data_dict)
 
-# 이미지로 뽑기
+columns = ["rmsd-bb", "rmsd-ca", "tmscore", "lddt-bb", "lddt-ca"]
+indices = pd.MultiIndex.from_tuples([
+    ('noise', '0.5Å'),
+    ('noise', '1.0Å'),
+    ('noise', '2.0Å'),
+    ('noise', '5.0Å'),
+    ('global torsion', "5°"),
+    ('global torsion', "10°"),
+    ('local torsion', "30°"),
+    ('local torsion', "60°")
+], names = ['Type', 'Perturbation'])
+
+df_dict: dict[str, pd.DataFrame] = {}
+for id, data in data_dict.items():
+    df = pd.DataFrame(data, index= indices, columns = columns)
+    df_dict[id] = df
+# print(data_dict["1CRN"])
+# print(type(df_dict["1CRN"]))
+
+for id, df in df_dict.items():
+    df.to_csv(f'result/{id}_result.csv', index= True, encoding='utf-8-sig', )
+
 
