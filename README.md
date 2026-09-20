@@ -39,6 +39,8 @@ RADetector/
 ├── README.md
 └── run.sh
 
+---
+
 ## Overview
 
 ### Pipeline Logic
