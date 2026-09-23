@@ -1,0 +1,15 @@
+[workspace]
+authors = ["RadishJin <radishj24@gmail.com>"]
+channels = ["conda-forge"]
+name = "RADmetrics"
+platforms = ["osx-arm64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+python = "3.11.*"
+biotite = ">=1.6.0,<2"
+pytorch = ">=2.13.0,<3"
+numpy = ">=2.3.5,<3"
+pandas = ">=3.0.6,<4"

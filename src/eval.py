@@ -166,7 +166,7 @@ for id in id_list:
     decoy_list = list(decoy_dict[f"{id}_ca"].keys())
     # print(decoy_list)
     for decoy in decoy_list:
-        sup_pos = struc.superimpose_structural_homologs(ans_dict_ca[f"{id}"], decoy_dict[f"{id}_ca"][f"{decoy}"],)
+        sup_pos = struc.superimpose(ans_dict_ca[f"{id}"], decoy_dict[f"{id}_ca"][f"{decoy}"],)
         # print(type(sup_pos))
         n_range = np.arange(len(ans_dict_ca[f"{id}"]))
         # print(n_range)
@@ -175,7 +175,6 @@ for id in id_list:
 # print(tm_list)
 
 # .csv 파일로 뽑기
-
 
 #                      |rmsd-bb | rmsd-ca | tmscore | lddt-bb | lddt-ca
 #  noise   0.5A
