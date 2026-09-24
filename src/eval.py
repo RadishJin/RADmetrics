@@ -126,7 +126,7 @@ for id in id_list:
     decoy_list = list(decoy_dict[f"{id}_bb"].keys())
     # print(decoy_list)
     for decoy in decoy_list:
-        rmspd = round(struc.rmspd(ans_dict_bb[f"{id}"], decoy_dict[f"{id}_bb"][f"{decoy}"]), 3)
+        rmspd = f'{struc.rmspd(ans_dict_bb[f"{id}"], decoy_dict[f"{id}_bb"][f"{decoy}"]):.3f}'
         rmsd_bb_list.append(rmspd)
 
 # rmsd - Ca
@@ -136,7 +136,7 @@ for id in id_list:
     decoy_list = list(decoy_dict[f"{id}_ca"].keys())
     # print(decoy_list)
     for decoy in decoy_list:
-        rmspd = round(struc.rmspd(ans_dict_ca[f"{id}"], decoy_dict[f"{id}_ca"][f"{decoy}"]), 3)
+        rmspd = f'{struc.rmspd(ans_dict_ca[f"{id}"], decoy_dict[f"{id}_ca"][f"{decoy}"]):.3f}'
         rmsd_ca_list.append(rmspd)
 
 # lDDT - backbone
@@ -146,7 +146,7 @@ for id in id_list:
     decoy_list = list(decoy_dict[f"{id}_bb"].keys())
     # print(decoy_list)
     for decoy in decoy_list:
-        lddt = round(struc.lddt(ans_dict_bb[f"{id}"], decoy_dict[f"{id}_bb"][f"{decoy}"]), 3)
+        lddt = f'{struc.lddt(ans_dict_bb[f"{id}"], decoy_dict[f"{id}_bb"][f"{decoy}"]):.3f}'
         lddt_bb_list.append(lddt)
 
 # lDDT - Ca
@@ -156,7 +156,7 @@ for id in id_list:
     decoy_list = list(decoy_dict[f"{id}_ca"].keys())
     # print(decoy_list)
     for decoy in decoy_list:
-        lddt = round(struc.lddt(ans_dict_ca[f"{id}"], decoy_dict[f"{id}_ca"][f"{decoy}"]), 3)
+        lddt = f'{struc.lddt(ans_dict_ca[f"{id}"], decoy_dict[f"{id}_ca"][f"{decoy}"]):.3f}'
         lddt_ca_list.append(lddt)
 
 # TMscore
@@ -170,7 +170,7 @@ for id in id_list:
         # print(type(sup_pos))
         n_range = np.arange(len(ans_dict_ca[f"{id}"]))
         # print(n_range)
-        tm = round(struc.tm_score(ans_dict_ca[f"{id}"], sup_pos[0], n_range, n_range), 3)
+        tm = f'{struc.tm_score(ans_dict_ca[f"{id}"], sup_pos[0], n_range, n_range):.3f}'
         tm_list.append(tm)
 # print(tm_list)
 

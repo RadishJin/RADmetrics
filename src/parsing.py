@@ -16,7 +16,7 @@ for id in id_list:
 
 
     # pdbx.get_structrue로 텍스트데이터를 AtomArray로 파싱
-    atoms = pdbx.get_structure(raw, model= 1) # 1D로 파싱하기 위해 model = 1
+    atoms = pdbx.get_structure(raw, model= 1)
     # print(atoms)
 
     # Biotite.structure 이용 residue와 관련된 원자만 남기기 (비표준 아미노산도 포함)
