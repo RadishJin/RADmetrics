@@ -10,7 +10,7 @@ import random
 
 
 
-# 가우시안 노이즈 적용
+# Gaussian noise - Cartesian
 def noise_gaussian(bb_atoms: struc.AtomArray, sigma: float) -> struc.AtomArray:
 
     pre = bb_atoms.copy()
@@ -27,7 +27,7 @@ def noise_gaussian(bb_atoms: struc.AtomArray, sigma: float) -> struc.AtomArray:
     return pre
 
 
-# Global Torsion Angle Perturbation
+# Global Perturbation - Torsion Angle
 def noise_global_torsion(bb_atoms: struc.AtomArray, angle: float) -> struc.AtomArray:
 
     pre = bb_atoms.copy()
@@ -63,6 +63,27 @@ def noise_global_torsion(bb_atoms: struc.AtomArray, angle: float) -> struc.AtomA
 
     return pre
 
+
+# Local Extreme Perturbation - Torsion Angle
+def noise_local_torsion(bb_atoms: struc.AtomArray, torsion: float) -> struc.AtomArray:
+
+    pre = bb_atoms.copy()
+
+    mid = int(len(pre)/2)
+
+    downstream = pre[mid:]
+    axis = pre[mid - 1].coord - pre[mid - 2].coord
+    support = pre[mid-1].coord
+    downstream = struc.rotate_about_axis(
+        downstream,
+        angle = torsion,
+        axis = axis,
+        support = support
+    )
+    struc.coord(pre[mid:])[:] = struc.coord(downstream)
+
+    return pre
+
 #######################
 # 실행 코드
 
@@ -85,7 +106,6 @@ for id in id_single_chain:
 # 멀티체인 데이터 정리
 multi_chain = data_dict["5DK3"]
 chain_list = list(struc.chain_iter(multi_chain))
-
 
 # 그릇
 decoy_dict = {}
@@ -125,175 +145,50 @@ for id, bb_atoms in single_dict.items():
         decoy_dict[f"{id}_{deg}degree"] = decoy
 
 # Multi Chain
-# chain_decoy = []
-# n = 0
-# for chain in chain_list:
-#     bb_phi, bb_psi, bb_omega = struc.dihedral_backbone(chain)
-#     bb_phi_tensor = torch.tensor(bb_phi)
-#     bb_psi_tensor = torch.tensor(bb_psi)
-#     bb_omega_tensor = torch.tensor(bb_omega)
-#     tensor_list = [bb_phi_tensor, bb_psi_tensor, bb_omega_tensor]
-#     angle_noise_list = [pi/36, pi/18]
-#     pre_decoy = []
-#     for angle in angle_noise_list:
-#         for tensor in tensor_list:
-#             noise = torch.randn_like(tensor) * angle
-#             noise = noise.detach().cpu().numpy().tolist()
-#             pre_decoy.append(noise)
-
-#     five_degree = [i for j in zip(pre_decoy[0], pre_decoy[1], pre_decoy[2]) for i in j]
-#     ten_degree = [i for j in zip(pre_decoy[3], pre_decoy[4], pre_decoy[5]) for i in j]
-
-#     five_degree = five_degree[1:-1]
-#     ten_degree = ten_degree[1:-1]
-
-#     j = 0
-#     for angle in five_degree, ten_degree:
-#         pre2 = chain.copy()
-#         for i in range(len(angle)):
-#             if i+2 > len(pre2):
-#                 break
-#             axis = pre2[i+1].coord - pre2[i].coord
-#             support = pre2[i+1].coord
-#             downstream = pre2[i+2:]
-#             downstream = struc.rotate_about_axis(
-#                 downstream,
-#                 angle = angle[i],
-#                 axis = axis,
-#                 support = support
-#             )
-#             struc.coord(pre2[i+2:])[:] = struc.coord(downstream)
-#         j += 5
-#         chain_decoy[f"n{j}degree_{n}"] = pre2
-#     n += 1
-# # print(chain_decoy.keys())
-
-# five, ten = [], []
-# angles = [5, 10]
-# for id, chain in chain_decoy.items():
-#     if id.startswith(f"n{angles[0]}"):
-#         five.append(chain)
-#     if id.startswith(f"n{angles[1]}"):
-#         ten.append(chain)
-
-# n = 0
-# for i in five, ten:
-#     combined_chain = sum(i, struc.AtomArray(0))
-#     decoy_dict[f"5DK3_{angles[n]}degree"] = combined_chain
-#     n += 1
-
-
-# # (3) Local Extreme Perturbation (대충 가운데 부근 한 곳에서 결합각 대폭 조정, 30도 60도.)
-
-# # single chain
-# for id in id_single_chain:
-#     # 원본 데이터셋 가져와서
-#     pre3 = data_dict[f"{id}"][0].copy()
-#     pre4 = data_dict[f"{id}"][0].copy()
-
-#     # 돌릴 각도 저장해놓고
-#     torsion = [pi/6, pi/3]
-
-#     # 대충 중간 지점 정하고
-#     mid = int(len(pre3)/2)
-#     # print(mid)
-
-#     # 변형 - 30degree
-#     downstream = pre3[mid:]
-#     axis = pre3[mid - 1].coord - pre3[mid - 2].coord
-#     support = pre3[mid-1].coord
-#     downstream = struc.rotate_about_axis(
-#         downstream,
-#         angle = torsion[0],
-#         axis = axis,
-#         support = support
-#     )
-#     struc.coord(pre3[mid:])[:] = struc.coord(downstream)
-#     decoy_dict[f"{id}_ex30"] = pre3
-
-#     # 변형 - 60degree
-#     downstream = pre4[mid:]
-#     axis = pre4[mid-1].coord - pre4[mid-2].coord
-#     support = pre4[mid-1].coord
-#     downstream = struc.rotate_about_axis(
-#         downstream,
-#         angle = torsion[1],
-#         axis = axis,
-#         support = support
-#     )
-#     struc.coord(pre4[mid:])[:] = struc.coord(downstream)
-#     decoy_dict[f"{id}_ex60"] = pre4
+for angle in angles:
+    chain_decoy = []
+    for chain in chain_list:
+        decoy = noise_global_torsion(chain, angle)
+        chain_decoy.append(decoy)
+    pre = struc.concatenate(chain_decoy)
+    deg = int(np.rad2deg(angle))
+    decoy_dict[f"5DK3_{deg}degree"] = pre
 
 
 
-
-# # Multi Chain
-# chain_decoy = {}
-
-# chain = random.choice(chain_list)
-# chain_name = struc.get_chains(chain)[0]
-# # print(chain_name)
-
-# pre3 = chain.copy()
-# pre4 = chain.copy()
-
-# mid = int(len(pre3)/2)
-
-# downstream = pre3[mid:]
-# axis = pre3[mid - 1].coord - pre3[mid - 2].coord
-# support = pre3[mid-1].coord
-# downstream = struc.rotate_about_axis(
-#     downstream,
-#     angle = torsion[0],
-#     axis = axis,
-#     support = support
-# )
-# struc.coord(pre3[mid:])[:] = struc.coord(downstream)
-# chain_decoy[f"{chain_name}_ex30"] = pre3
-
-# downstream = pre4[mid:]
-# axis = pre4[mid-1].coord - pre4[mid-2].coord
-# support = pre4[mid-1].coord
-# downstream = struc.rotate_about_axis(
-#     downstream,
-#     angle = torsion[1],
-#     axis = axis,
-#     support = support
-# )
-# struc.coord(pre4[mid:])[:] = struc.coord(downstream)
-# chain_decoy[f"{chain_name}_ex60"] = pre4
-# # print(chain_decoy)
-# # print(struc.get_chains(chain_list[0]))
-
-# chain_num_map = {
-#     "A" : 0,
-#     "B" : 1,
-#     "F" : 2,
-#     "G" : 3
-# }
-# alpha = list(chain_decoy.keys())[0]
-# alpha = alpha.strip().split("_")[0]
-# chain_num = chain_num_map[alpha]
-# # print(chain_num)
-
-# pre8 = chain_list.copy()
-# pre9 = chain_list.copy()
-# pre8[chain_num] = chain_decoy[f"{alpha}_ex30"]
-# pre9[chain_num] = chain_decoy[f"{alpha}_ex60"]
-
-# ex_list = [30, 60]
-# n = 0
-# for i in pre8, pre9:
-#     combined_chain = sum(i, struc.AtomArray(0))
-#     decoy_dict[f"5DK3_ex{ex_list[n]}"] = combined_chain
-#     n += 1
+# (3) Local Extreme Perturbation (대충 가운데 부근 한 곳에서 결합각 대폭 조정, 30도 60도.)
+torsions = [pi/6, pi/3]
 
 
-# # test
-# # print(decoy_dict.keys())
-# # print(decoy_dict["5DK3_ex60"] == data_dict["5DK3"][0])
+# single chain
+for id, bb_atoms in single_dict.items():
+    for torsion in torsions:
+        decoy = noise_local_torsion(bb_atoms, torsion)
+        deg = int(np.rad2deg(torsion))
+        decoy_dict[f"{id}_ex{deg + 1}"] = decoy
 
-# for name, array in decoy_dict.items():
-#     cif_file = pdbx.CIFFile()
-#     pdbx.set_structure(cif_file, array, data_block=f"decoy_{name}")
-#     cif_file.write(f"test_dataset/decoy_{name}.cif")
+
+# Multi Chain
+for torsion in torsions:
+    chain = random.choice(chain_list)
+    decoy = noise_local_torsion(chain, torsion)
+
+    chain_decoy = chain_list.copy()
+    idx = chain_decoy.index(chain)
+    chain_decoy[idx] = decoy
+
+    pre = struc.concatenate(chain_decoy)
+    deg = int(np.rad2deg(torsion))
+    decoy_dict[f"5DK3_ex{deg + 1}"] = pre
+
+
+
+# 출력
+for name, array in decoy_dict.items():
+    cif_file = pdbx.CIFFile()
+    pdbx.set_structure(cif_file, array, data_block=f"decoy_{name}")
+    cif_file.write(f"test_dataset/decoy_{name}.cif")
+
+########################
+
+# 추후 멀티체인과 싱글체인 동시에 다룰 수 있도록 2차 리팩토링 가능성

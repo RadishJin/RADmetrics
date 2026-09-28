@@ -4,6 +4,23 @@ import biotite.structure as struc
 import numpy as np
 import pandas as pd
 
+####################
+# 함수들
+
+def calc_metrics(ans: struc.AtomArray, decoy: struc.AtomArray) -> tuple[float, float, float]:
+
+    rmsd = f'{struc.rmspd(ans, decoy):.3f}'
+    lddt = f'{struc.lddt(ans, decoy):.3f}'
+
+    sup_pos = struc.superimpose(ans, decoy)
+    n_range = np.arange(len(ans))
+    tm = f'{struc.tm_score(ans, sup_pos[0], n_range, n_range):.3f}'
+
+    return (rmsd, lddt, tm)
+
+#####################
+# 실행 코드
+
 
 # 정답 데이터 가져오기
 
@@ -90,91 +107,46 @@ for file in sorted(directory.iterdir()):
 
 
 # Metric 계산하기
-
-# metric 결과값 저장소
-decoy_rmsd_dict = {}
-decoy_lddt_dict = {}
-decoy_tmscore_dict = {}
-for id in id_list:
-    decoy_rmsd_dict.setdefault(f"{id}_bb", [])
-    decoy_rmsd_dict.setdefault(f"{id}_ca", [])
-# print(decoy_rmsd_dict.keys())
-for id in id_list:
-    decoy_lddt_dict.setdefault(f"{id}_bb", [])
-    decoy_lddt_dict.setdefault(f"{id}_ca", [])
-# print(decoy_lddt_dict.keys())
-for id in id_list:
-    decoy_tmscore_dict.setdefault(f"{id}", [])
-# print(decoy_tmscore_dict.keys())
-
-
-# test
-# ['decoy_1CRN_0.5angstrom', 'decoy_1CRN_1.0angstrom', 'decoy_1CRN_10degree', 'decoy_1CRN_2.0angstrom', 'decoy_1CRN_5.0angstrom', 'decoy_1CRN_5degree', 'decoy_1CRN_ex30', 'decoy_1CRN_ex60']
-# 0.7153824065272497
-# 1.4128974324698986
-# 58.361695975918884
-# 2.8623942985583017
-# 7.160457759030418
-# 28.658485820659063
-# 7.191420607572877
-# 13.848104800380229
-
-# rmsd - backbone
 rmsd_bb_list = []
-decoy_list = list(decoy_dict)
-for id in id_list:
-    decoy_list = list(decoy_dict[f"{id}_bb"].keys())
-    # print(decoy_list)
-    for decoy in decoy_list:
-        rmspd = f'{struc.rmspd(ans_dict_bb[f"{id}"], decoy_dict[f"{id}_bb"][f"{decoy}"]):.3f}'
-        rmsd_bb_list.append(rmspd)
-
-# rmsd - Ca
-rmsd_ca_list = []
-decoy_list = list(decoy_dict)
-for id in id_list:
-    decoy_list = list(decoy_dict[f"{id}_ca"].keys())
-    # print(decoy_list)
-    for decoy in decoy_list:
-        rmspd = f'{struc.rmspd(ans_dict_ca[f"{id}"], decoy_dict[f"{id}_ca"][f"{decoy}"]):.3f}'
-        rmsd_ca_list.append(rmspd)
-
-# lDDT - backbone
 lddt_bb_list = []
-decoy_list = list(decoy_dict)
+tm_list = []
+rmsd_ca_list = []
+lddt_ca_list = []
+
+# backbone
 for id in id_list:
     decoy_list = list(decoy_dict[f"{id}_bb"].keys())
-    # print(decoy_list)
+
     for decoy in decoy_list:
-        lddt = f'{struc.lddt(ans_dict_bb[f"{id}"], decoy_dict[f"{id}_bb"][f"{decoy}"]):.3f}'
+        ans = ans_dict_bb[f"{id}"]
+        decoy = decoy_dict[f"{id}_bb"][f"{decoy}"]
+
+        rmsd, lddt, _ = calc_metrics(ans, decoy)
+
+        rmsd_bb_list.append(rmsd)
         lddt_bb_list.append(lddt)
 
-# lDDT - Ca
-lddt_ca_list = []
-decoy_list = list(decoy_dict)
+# alpha carbon
 for id in id_list:
     decoy_list = list(decoy_dict[f"{id}_ca"].keys())
-    # print(decoy_list)
-    for decoy in decoy_list:
-        lddt = f'{struc.lddt(ans_dict_ca[f"{id}"], decoy_dict[f"{id}_ca"][f"{decoy}"]):.3f}'
-        lddt_ca_list.append(lddt)
 
-# TMscore
-tm_list = []
-decoy_list = list(decoy_dict)
-for id in id_list:
-    decoy_list = list(decoy_dict[f"{id}_ca"].keys())
-    # print(decoy_list)
     for decoy in decoy_list:
-        sup_pos = struc.superimpose(ans_dict_ca[f"{id}"], decoy_dict[f"{id}_ca"][f"{decoy}"],)
-        # print(type(sup_pos))
-        n_range = np.arange(len(ans_dict_ca[f"{id}"]))
-        # print(n_range)
-        tm = f'{struc.tm_score(ans_dict_ca[f"{id}"], sup_pos[0], n_range, n_range):.3f}'
+        ans = ans_dict_ca[f"{id}"]
+        decoy = decoy_dict[f"{id}_ca"][f"{decoy}"]
+
+        rmsd, lddt, tm = calc_metrics(ans, decoy)
+
+        rmsd_ca_list.append(rmsd)
+        lddt_ca_list.append(lddt)
         tm_list.append(tm)
-# print(tm_list)
+
+
 
 # .csv 파일로 뽑기
+
+# 저장순서
+# ['decoy_1CRN_0.5angstrom', 'decoy_1CRN_1.0angstrom', 'decoy_1CRN_10degree', 'decoy_1CRN_2.0angstrom', 'decoy_1CRN_5.0angstrom', 'decoy_1CRN_5degree', 'decoy_1CRN_ex30', 'decoy_1CRN_ex60']
+
 
 #                      |rmsd-bb | rmsd-ca | tmscore | lddt-bb | lddt-ca
 #  noise   0.5A
