@@ -1,10 +1,9 @@
-# 목표 : (Backbone, Ca) RMSD, (Backbone, Ca) lDDT, TM-score 를 위한 데이터 전처리
-
 import gzip                                 # .gz 압축된 파일 읽기용
 import biotite.structure.io.pdbx as pdbx    # .cif 파일 읽기용
 import biotite.structure as struc           # 텍스트 파일 파싱용
 
 
+# 백본 아톰만 남기는 파서
 def bb_parser(atoms : struc.AtomArray) -> struc.AtomArray:
 
     # Biotite.structure 이용 residue와 관련된 원자만 남기기 (비표준 아미노산도 포함)
@@ -19,27 +18,15 @@ def bb_parser(atoms : struc.AtomArray) -> struc.AtomArray:
     return bb_atoms
 
 
-id_list = ["1CRN", "1CLL", "5DK3"]
+# cif.gz 파일을 AtomArray로 읽어오는 함수
+def load_structure(id: str) -> struc.AtomArray:
 
-for id in id_list:
-        
-    # gzip으로 압축파일 간단하게 열고, biotite 라이브러리 이용해서 객체로 바로 읽어오기
     with gzip.open(f"raw_dataset/{id}.cif.gz", "rt", encoding = "utf-8") as f:
         raw = pdbx.CIFFile.read(f)
-    # print(type(raw))
 
-    # pdbx.get_structrue로 텍스트데이터를 AtomArray로 파싱
     atoms = pdbx.get_structure(raw, model= 1)
-    # print(atoms)
 
-    # BackBone Atom만 남기기
-    bb_atoms = bb_parser(atoms)
-
-    # .cif 파일로 저장
-    cif_file = pdbx.CIFFile()
-    pdbx.set_structure(cif_file, bb_atoms, data_block=f"backbone_{id}")
-    cif_file.write(f"raw_dataset/parsed_{id}.cif")
-
+    return atoms
 
 
 
