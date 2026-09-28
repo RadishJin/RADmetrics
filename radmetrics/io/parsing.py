@@ -18,6 +18,20 @@ def bb_parser(atoms : struc.AtomArray) -> struc.AtomArray:
     return bb_atoms
 
 
+# 알파카본만 남기는 파서
+def ca_parser(atoms : struc.AtomArray) -> struc.AtomArray:
+
+    # Residue Atom Boolean Masking
+    residue_mask = struc.filter_amino_acids(atoms)
+    residue_atom = atoms[residue_mask]
+
+    # Alpha Carbon Boolean Masking
+    is_ca = (residue_atom.get_annotation("atom_name") == "CA")
+    ca_atoms = residue_atom[is_ca]
+
+    return ca_atoms
+
+
 # cif.gz 파일을 AtomArray로 읽어오는 함수
 def load_structure(id: str) -> struc.AtomArray:
 
