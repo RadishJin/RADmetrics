@@ -1,6 +1,6 @@
 # RADmetrics
 
-Benchmarking protein structural evaluation metrics (**RMSD**, **lDDT**, **TM-score**)
+Benchmarking protein structural evaluation metrics, only backbone atoms & alphacarbon (**RMSD**, **lDDT**, **TM-score**)
 
 - **Author**: Mu Jin Kim (B.S. student @ Kyungpook National University, Department of Biotechnology)
 - **Contact**: radishj24@gmail.com
@@ -24,20 +24,30 @@ Benchmarking protein structural evaluation metrics (**RMSD**, **lDDT**, **TM-sco
 
 ```text
 RADetector/
-├── .vscode/
-│   └── settings.json
-├── raw_dataset/        # Raw dataset from PDB [Ignored by Git]
-├── test_dataset/       # Noise-injected decoy datasets [Ignored by Git]
-├── result/             # Final evaluation summary [Ignored by Git]
-├── src/
-│   ├── gathering.sh    # Bash script for fetching datasets
-│   ├── parsing.py      # Data parsing and tensor conversion
-│   ├── preparing.py    # Torsion angle 기반 decoy 생성
-│   └── eval.py         # Metric calculation with decoy (TM-score, lDDT, RMSD)
+├── radmetrics/  
+│   ├── decoy/  
+│   │   ├── __init__.py
+│   │   └── preparing.py 
+│   ├── io/  
+│   │   ├── __init__.py
+│   │   ├── bash2py.py
+│   │   └── parsing.py    
+│   ├── metrics/   
+│   │   ├── __init__.py
+│   │   └── eval.py 
+│   ├── __init__.py 
+│   └── pipeline.py      
+├── raw_dataset/       
+├── result/    
+├── scripts
+│   └── gathering.sh
+├── .gitattributes      
 ├── .gitignore
 ├── LICENSE
-├── README.md
-└── run.sh
+├── main.py                # 실행 파일
+├── pixi.lock
+├── pixi.toml
+└── README.md
 ```
 
 ## Overview
